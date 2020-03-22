@@ -2,13 +2,15 @@ from jinja2 import Environment, FileSystemLoader, select_autoescape
 import json
 import math
 import os
+from dotenv import load_dotenv
+
 
 
 def get_books_catalogue():
-    with open("books.json", "r") as my_file:
+    catalogue_file = os.getenv('CATALOGUE_FILE')
+    with open(catalogue_file, "r") as my_file:
       books_json = my_file.read()
     books_catalogue = json.loads(books_json)
-    books_catalogue = books_catalogue[:100]
     return books_catalogue
 
 
@@ -21,13 +23,13 @@ def get_template():
     return template
 
 
-def get_rendered_page():
+def render_pages():
     template = get_template()
     books_catalogue = get_books_catalogue()  
     books_amount = len(books_catalogue)
     books_amount_on_page = 20
     pages_amount = math.ceil(books_amount/books_amount_on_page)
-    folder = 'pages'
+    folder = os.getenv('PAGES_FOLDER')
     os.makedirs(folder, exist_ok=True)
 
     for num in range(0,books_amount,books_amount_on_page):
@@ -43,4 +45,5 @@ def get_rendered_page():
             file.write(rendered_page)
 
 if __name__ == "__main__":
-    get_rendered_page()
+    load_dotenv()
+    render_pages()
